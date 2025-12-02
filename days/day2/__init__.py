@@ -49,19 +49,19 @@ def find_invalids_1(a: str, b: str) -> list[int]:
 def find_invalids_2(a: str, b: str) -> set[int]:
     """
     >>> find_invalids_2('1', '2')
-    []
+    set()
     >>> find_invalids_2('11', '22')
-    [11, 22]
+    {11, 22}
     >>> find_invalids_2('95', '99')
-    [99]
+    {99}
     >>> find_invalids_2('100', '115')
-    [111]
+    {111}
     >>> find_invalids_2('998', '999')
-    [999]
+    {999}
     >>> find_invalids_2('1000', '1012')
-    [1010]
+    {1010}
     >>> find_invalids_2('1188511880', '1188511890')
-    [1188511885]
+    {1188511885}
     """
 
     assert len(a) == len(b)
