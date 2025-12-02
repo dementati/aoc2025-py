@@ -18,6 +18,18 @@ def parse_input_file(file_path: str) -> list[tuple[bool, int]]:
     return parse_input(input_string)
 
 
+def star1(input_str: str) -> None:
+    instructions = parse_input(input_str)
+    result = solve_star1(instructions)
+    print(result)
+
+
+def star2(input_str: str) -> None:
+    instructions = parse_input(input_str)
+    result = solve_star2(instructions)
+    print(result)
+
+
 def solve_star1(instructions: list[tuple[bool, int]]) -> int:
     """Solves star 1.
 
@@ -55,9 +67,6 @@ def sign(num: int) -> int:
         return 0
 
 
-from icecream import ic
-
-
 def solve_star2(instructions: list[tuple[bool, int]]) -> int:
     """Solves star 2.
 
@@ -69,6 +78,8 @@ def solve_star2(instructions: list[tuple[bool, int]]) -> int:
     2
     >>> solve_star2([(True, 50)])
     1
+    >>> solve_star2([(True, 50), (False, 300), (True, 10)])
+    4
     """
 
     dial = 50
@@ -76,7 +87,6 @@ def solve_star2(instructions: list[tuple[bool, int]]) -> int:
     for turn_left, dist in instructions:
         for _ in range(dist):
             dial = (dial + (-1 if turn_left else 1)) % 100
-
             if dial == 0:
                 zero_count += 1
 
