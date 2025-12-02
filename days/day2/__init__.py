@@ -89,18 +89,6 @@ def find_invalids_2(a: str, b: str) -> list[int]:
     return invalids
 
 
-def even_digits(num: int) -> bool:
-    """Checks if the number has an even number of digits.
-
-    >>> even_digits(1234)
-    True
-    >>> even_digits(123)
-    False
-    """
-
-    return len(str(num)) % 2 == 0
-
-
 def subdivide(a: str, b: str) -> list[tuple[str, str]]:
     """Subdivides the range into smaller ranges based on prefix.
 
