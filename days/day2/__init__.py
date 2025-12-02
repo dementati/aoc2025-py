@@ -151,12 +151,11 @@ def solve_star2(input_str: str) -> int:
     return sum_invalids
 
 
-def star1(input_str: str) -> None:
+def star1(input_str: str) -> str:
     items = parse_input(input_str)
     result = solve_star1(items)
-    print(result)
+    return str(result)
 
 
-def star2(input_str: str) -> None:
-    result = solve_star2(input_str)
-    print(result)
+def star2(input_str: str) -> str:
+    return str(solve_star2(input_str))

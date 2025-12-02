@@ -18,16 +18,15 @@ def parse_input_file(file_path: str) -> list[tuple[bool, int]]:
     return parse_input(input_string)
 
 
-def star1(input_str: str) -> None:
+def star1(input_str: str) -> str:
     instructions = parse_input(input_str)
     result = solve_star1(instructions)
-    print(result)
+    return str(result)
 
 
-def star2(input_str: str) -> None:
+def star2(input_str: str) -> str:
     instructions = parse_input(input_str)
-    result = solve_star2(instructions)
-    print(result)
+    return str(solve_star2(instructions))
 
 
 def solve_star1(instructions: list[tuple[bool, int]]) -> int:

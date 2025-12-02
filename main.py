@@ -1,6 +1,7 @@
 # ...existing code...
 import argparse
 import importlib
+import time
 
 
 def main():
@@ -32,7 +33,11 @@ def main():
         if not callable(func):
             print(f"{module_name}.{func_name} exists but is not callable.")
             return
-        func(input_str)
+
+        start = time.perf_counter_ns()
+        result = func(input_str)
+        print(f"Time taken: {(time.perf_counter_ns() - start) / 1_000_000_000} s")
+        print(result)
     except ModuleNotFoundError:
         print(f"Module {module_name} not found.")
     except Exception as e:
