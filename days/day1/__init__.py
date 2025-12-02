@@ -10,14 +10,6 @@ def parse_input(input_string: str) -> list[tuple[bool, int]]:
     ]
 
 
-def parse_input_file(file_path: str) -> list[tuple[bool, int]]:
-    """Reads the input file and parses its content."""
-
-    with open(file_path, "r") as file:
-        input_string = file.read()
-    return parse_input(input_string)
-
-
 def star1(input_str: str) -> str:
     instructions = parse_input(input_str)
     result = solve_star1(instructions)

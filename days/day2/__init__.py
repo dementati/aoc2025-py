@@ -12,14 +12,6 @@ def parse_input(input_string: str) -> list[tuple[str, str]]:
     return [line_split(line) for line in input_string.strip().split(",")]
 
 
-def parse_input_file(file_path: str) -> list[tuple[str, str]]:
-    """Reads the input file and parses its content."""
-
-    with open(file_path, "r") as file:
-        input_string = file.read()
-    return parse_input(input_string)
-
-
 def find_invalids_1(a: str, b: str) -> list[int]:
     """
     >>> find_invalids_1('122000', '124999')
