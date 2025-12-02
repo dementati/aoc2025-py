@@ -113,14 +113,23 @@ def subdivide(a: str, b: str) -> list[tuple[str, str]]:
     start = int(a)
     end = int(b)
 
-    ranges = []
-    last_boundary = start
-    for i in range(start, end + 1):
-        if even_digits(i) != even_digits(i + 1):
-            ranges.append((str(last_boundary), str(i)))
-            last_boundary = i + 1
+    start_digit_count = len(a)
+    end_digit_count = len(b)
 
-    ranges.append((str(last_boundary), str(end)))
+    ranges = []
+    for digit_count in range(start_digit_count, end_digit_count + 1):
+        if digit_count == start_digit_count:
+            range_start = start
+        else:
+            range_start = 10 ** (digit_count - 1)
+
+        if digit_count == end_digit_count:
+            range_end = end
+        else:
+            range_end = (10**digit_count) - 1
+
+        ranges.append((str(range_start), str(range_end)))
+
     return ranges
 
 
