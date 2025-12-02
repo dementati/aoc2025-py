@@ -46,7 +46,7 @@ def find_invalids_1(a: str, b: str) -> list[int]:
     return invalids
 
 
-def find_invalids_2(a: str, b: str) -> list[int]:
+def find_invalids_2(a: str, b: str) -> set[int]:
     """
     >>> find_invalids_2('1', '2')
     []
@@ -66,7 +66,7 @@ def find_invalids_2(a: str, b: str) -> list[int]:
 
     assert len(a) == len(b)
 
-    invalids = []
+    invalids = set()
     for prefix_len in range(1, (len(a) // 2) + 1):
         if len(a) % prefix_len != 0:
             continue
@@ -79,12 +79,8 @@ def find_invalids_2(a: str, b: str) -> list[int]:
         for prefix in range(start, end + 1):
             prefix_str = str(prefix)
             duplicate = int(prefix_str * mult_count)
-            if (
-                duplicate >= int(a)
-                and duplicate <= int(b)
-                and duplicate not in invalids
-            ):
-                invalids.append(duplicate)
+            if duplicate >= int(a) and duplicate <= int(b):
+                invalids.add(duplicate)
 
     return invalids
 
