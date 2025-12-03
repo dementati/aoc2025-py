@@ -10,13 +10,14 @@ def main():
     parser.add_argument(
         "star", type=int, choices=[1, 2], help="Star of the challenge (1 or 2)"
     )
+    parser.add_argument("-f", "--func", type=str, help="Optional function name to run")
     args = parser.parse_args()
 
     day = args.day
     star = args.star
 
     module_name = f"days.day{day}"
-    func_name = f"star{star}"
+    func_name = f"star{star}" if not args.func else args.func
     print(f"Running {module_name}.{func_name}()...")
     try:
         module = importlib.import_module(module_name)
