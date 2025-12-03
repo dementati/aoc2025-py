@@ -2,6 +2,8 @@
 import argparse
 import importlib
 import time
+import timeit
+from typing import Callable, cast
 
 
 def main():
@@ -11,6 +13,7 @@ def main():
         "star", type=int, choices=[1, 2], help="Star of the challenge (1 or 2)"
     )
     parser.add_argument("-f", "--func", type=str, help="Optional function name to run")
+    parser.add_argument("-p", "--perf", action="store_true", help="Profile performance")
     args = parser.parse_args()
 
     day = args.day
@@ -21,7 +24,7 @@ def main():
     print(f"Running {module_name}.{func_name}()...")
     try:
         module = importlib.import_module(module_name)
-        func = getattr(module, func_name, None)
+        func = cast(Callable[[str], str], getattr(module, func_name, None))
 
         with open(f"days/day{day}/input.txt") as file:
             input_str = file.read()
@@ -35,11 +38,18 @@ def main():
             print(f"{module_name}.{func_name} exists but is not callable.")
             return
 
-        start = time.perf_counter_ns()
+        if args.perf:
+            print("Profiling...")
+            timer = timeit.Timer(lambda: func(input_str))
+            number, total = timer.autorange()
+            per_call = total / number
+            print(f"Executed {number} times in {total:.6f} seconds.")
+            print(f"{per_call:.6f} s")
+            print(f"{per_call * 1000:.6f} ms")
+            print(f"{per_call * 1_000_000:.6f} µs")
+            return
+
         result = func(input_str)
-        print(f"{(time.perf_counter_ns() - start) / 1_000_000_000} s")
-        print(f"{(time.perf_counter_ns() - start) / 1_000_000} ms")
-        print(f"{(time.perf_counter_ns() - start) / 1_000} µs")
         print(f"Result: {result}")
     except ModuleNotFoundError:
         print(f"Module {module_name} not found.")

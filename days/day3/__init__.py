@@ -54,7 +54,11 @@ def joltage_stack(battery: str, size: int) -> int:
     for i, c in enumerate(battery):
         remaining = n - i
 
-        while stack and c > stack[-1] and len(stack) + remaining > size:
+        if not stack:
+            stack.append(c)
+            continue
+
+        while c > stack[-1] and len(stack) + remaining > size:
             stack.pop()
             if not stack:
                 break
