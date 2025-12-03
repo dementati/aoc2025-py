@@ -36,8 +36,10 @@ def main():
 
         start = time.perf_counter_ns()
         result = func(input_str)
-        print(f"Time taken: {(time.perf_counter_ns() - start) / 1_000_000_000} s")
-        print(result)
+        print(f"{(time.perf_counter_ns() - start) / 1_000_000_000} s")
+        print(f"{(time.perf_counter_ns() - start) / 1_000_000} ms")
+        print(f"{(time.perf_counter_ns() - start) / 1_000} µs")
+        print(f"Result: {result}")
     except ModuleNotFoundError:
         print(f"Module {module_name} not found.")
     except Exception as e:
