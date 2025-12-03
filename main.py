@@ -40,7 +40,11 @@ def main():
 
         if args.perf:
             print("Profiling...")
-            timer = timeit.Timer(lambda: func(input_str))
+
+            def benchmark():
+                func(input_str)
+
+            timer = timeit.Timer(benchmark)
             number, total = timer.autorange()
             per_call = total / number
             print(f"Executed {number} times in {total:.6f} seconds.")
