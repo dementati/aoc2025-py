@@ -1,4 +1,11 @@
 from dataclasses import dataclass
+from functools import cache
+from itertools import product
+
+
+NEIGHBOURS: set[tuple[int, int]] = {
+    (x, y) for (x, y) in product(range(-1, 2), repeat=2) if not (x == 0 and y == 0)
+}
 
 
 @dataclass(eq=True, frozen=True, slots=True)
@@ -12,17 +19,9 @@ class Vec2:
     def __sub__(self, other: "Vec2") -> "Vec2":
         return Vec2(self.x - other.x, self.y - other.y)
 
-
-NEIGHBOURS_DX: set[Vec2] = {
-    Vec2(-1, -1),
-    Vec2(0, -1),
-    Vec2(1, -1),
-    Vec2(-1, 0),
-    Vec2(1, 0),
-    Vec2(-1, 1),
-    Vec2(0, 1),
-    Vec2(1, 1),
-}
+    @cache
+    def neighbours(self) -> set["Vec2"]:
+        return {Vec2(self.x + dx, self.y + dy) for (dx, dy) in NEIGHBOURS}
 
 
 @dataclass
@@ -49,19 +48,14 @@ class Diagram:
         return cls.from_str(input_str)
 
     def neighbours(self, vec: Vec2) -> set[Vec2]:
-        vx, vy = vec.x, vec.y
-
         max_x, max_y = self.size.x, self.size.y
         rolls = self.rolls
 
         result: set[Vec2] = set()
-        for d in NEIGHBOURS_DX:
-            nx = vx + d.x
-            ny = vy + d.y
-            if 0 <= nx < max_x and 0 <= ny < max_y:
-                v = Vec2(nx, ny)
-                if v in rolls:
-                    result.add(v)
+        for nb in vec.neighbours():
+            if 0 <= nb.x < max_x and 0 <= nb.y < max_y:
+                if nb in rolls:
+                    result.add(nb)
         return result
 
 
