@@ -28,7 +28,6 @@ class Vec2:
 class Diagram:
     rolls: set[Vec2]
     to_check: set[Vec2]
-    size: Vec2
 
     @classmethod
     def from_str(cls, input_str: str) -> "Diagram":
@@ -38,8 +37,7 @@ class Diagram:
             for x, char in enumerate(line):
                 if char == "@":
                     rolls.add(Vec2(x, y))
-        size = Vec2(len(lines[0]), len(lines))
-        return cls(rolls=rolls, to_check=rolls, size=size)
+        return cls(rolls=rolls, to_check=rolls)
 
     @classmethod
     def from_file(cls, filepath: str) -> "Diagram":
@@ -48,13 +46,7 @@ class Diagram:
         return cls.from_str(input_str)
 
     def neighbours(self, vec: Vec2) -> set[Vec2]:
-        max_x, max_y = self.size.x, self.size.y
-
-        return {
-            nb
-            for nb in vec.neighbours()
-            if 0 <= nb.x < max_x and 0 <= nb.y < max_y and nb in self.rolls
-        }
+        return vec.neighbours() & self.rolls
 
 
 def read_example() -> Diagram:
