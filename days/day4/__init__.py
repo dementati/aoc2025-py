@@ -24,10 +24,6 @@ class Vec2:
         return {Vec2(self.x + dx, self.y + dy) for (dx, dy) in NEIGHBOURS}
 
 
-def bounded(vec: Vec2, size: Vec2) -> bool:
-    return 0 <= vec.x < size.x and 0 <= vec.y < size.y
-
-
 @dataclass
 class Diagram:
     rolls: set[Vec2]
