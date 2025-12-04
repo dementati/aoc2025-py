@@ -45,48 +45,46 @@ class Diagram:
             input_str = file.read()
         return cls.from_str(input_str)
 
-    def neighbours(self, vec: Vec2) -> set[Vec2]:
-        return vec.neighbours() & self.rolls
+    @classmethod
+    def from_example(cls) -> "Diagram":
+        return cls.from_file("days/day4/examples/1.txt")
 
+    def accessible(self) -> set[Vec2]:
+        """
+        >>> Diagram.from_example().accessible()
+        {Vec2(x=0, y=1), Vec2(x=0, y=7), Vec2(x=6, y=2), Vec2(x=0, y=4), Vec2(x=2, y=0), Vec2(x=0, y=9), Vec2(x=8, y=0), Vec2(x=3, y=0), Vec2(x=2, y=9), Vec2(x=8, y=9), Vec2(x=5, y=0), Vec2(x=6, y=0), Vec2(x=9, y=4)}
+        """
 
-def read_example() -> Diagram:
-    return Diagram.from_file("days/day4/examples/1.txt")
+        return {
+            roll for roll in self.to_check if len(roll.neighbours() & self.rolls) < 4
+        }
 
+    def remove(self, to_remove: set[Vec2]) -> None:
+        self.rolls = self.rolls - to_remove
+        self.to_check = {
+            nb for roll in to_remove for nb in roll.neighbours()
+        } & self.rolls
 
-def accessible(inp: Diagram) -> set[Vec2]:
-    """
-    >>> accessible(read_example())
-    {Vec2(x=0, y=1), Vec2(x=0, y=7), Vec2(x=6, y=2), Vec2(x=0, y=4), Vec2(x=2, y=0), Vec2(x=0, y=9), Vec2(x=8, y=0), Vec2(x=3, y=0), Vec2(x=2, y=9), Vec2(x=8, y=9), Vec2(x=5, y=0), Vec2(x=6, y=0), Vec2(x=9, y=4)}
-    """
+    def repeat(self) -> int:
+        """
+        >>> Diagram.from_example().repeat()
+        43
+        """
+        to_remove = self.accessible()
+        total_count = len(to_remove)
+        while to_remove:
+            self.remove(to_remove)
+            to_remove = self.accessible()
+            total_count += len(to_remove)
 
-    return {roll for roll in inp.to_check if len(inp.neighbours(roll)) < 4}
-
-
-def remove(inp: Diagram, to_remove: set[Vec2]) -> None:
-    inp.rolls = inp.rolls - to_remove
-    inp.to_check = {nb for roll in to_remove for nb in inp.neighbours(roll)} & inp.rolls
-
-
-def repeat(inp: Diagram) -> int:
-    """
-    >>> repeat(read_example())
-    43
-    """
-    to_remove = accessible(inp)
-    total_count = len(to_remove)
-    while to_remove:
-        remove(inp, to_remove)
-        to_remove = accessible(inp)
-        total_count += len(to_remove)
-
-    return total_count
+        return total_count
 
 
 def star1(input_str: str) -> str:
     inp = Diagram.from_str(input_str)
-    return str(len(accessible(inp)))
+    return str(len(inp.accessible()))
 
 
 def star2(input_str: str) -> str:
     inp = Diagram.from_str(input_str)
-    return str(repeat(inp))
+    return str(inp.repeat())
