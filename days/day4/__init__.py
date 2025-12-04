@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import dataclass
 from functools import cache
 from itertools import product
@@ -13,14 +14,14 @@ class Vec2:
     x: int
     y: int
 
-    def __add__(self, other: "Vec2") -> "Vec2":
+    def __add__(self, other: Vec2) -> Vec2:
         return Vec2(self.x + other.x, self.y + other.y)
 
-    def __sub__(self, other: "Vec2") -> "Vec2":
+    def __sub__(self, other: Vec2) -> Vec2:
         return Vec2(self.x - other.x, self.y - other.y)
 
     @cache
-    def neighbours(self) -> set["Vec2"]:
+    def neighbours(self) -> set[Vec2]:
         return {Vec2(self.x + dx, self.y + dy) for (dx, dy) in NEIGHBOURS}
 
 
@@ -30,7 +31,7 @@ class Diagram:
     to_check: set[Vec2]
 
     @classmethod
-    def from_str(cls, input_str: str) -> "Diagram":
+    def from_str(cls, input_str: str) -> Diagram:
         rolls = set()
         lines = input_str.splitlines()
         for y, line in enumerate(lines):
@@ -40,13 +41,13 @@ class Diagram:
         return cls(rolls=rolls, to_check=rolls)
 
     @classmethod
-    def from_file(cls, filepath: str) -> "Diagram":
+    def from_file(cls, filepath: str) -> Diagram:
         with open(filepath) as file:
             input_str = file.read()
         return cls.from_str(input_str)
 
     @classmethod
-    def from_example(cls) -> "Diagram":
+    def from_example(cls) -> Diagram:
         return cls.from_file("days/day4/examples/1.txt")
 
     def accessible(self) -> set[Vec2]:
