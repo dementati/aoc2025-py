@@ -24,6 +24,10 @@ class Vec2:
         return {Vec2(self.x + dx, self.y + dy) for (dx, dy) in NEIGHBOURS}
 
 
+def bounded(vec: Vec2, size: Vec2) -> bool:
+    return 0 <= vec.x < size.x and 0 <= vec.y < size.y
+
+
 @dataclass
 class Diagram:
     rolls: set[Vec2]
@@ -49,14 +53,12 @@ class Diagram:
 
     def neighbours(self, vec: Vec2) -> set[Vec2]:
         max_x, max_y = self.size.x, self.size.y
-        rolls = self.rolls
 
-        result: set[Vec2] = set()
-        for nb in vec.neighbours():
-            if 0 <= nb.x < max_x and 0 <= nb.y < max_y:
-                if nb in rolls:
-                    result.add(nb)
-        return result
+        return {
+            nb
+            for nb in vec.neighbours()
+            if 0 <= nb.x < max_x and 0 <= nb.y < max_y and nb in self.rolls
+        }
 
 
 def read_example() -> Diagram:
