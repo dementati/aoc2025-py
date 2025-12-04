@@ -1,100 +1,108 @@
-def read_example() -> list[str]:
-    with open("days/day4/examples/1.txt") as file:
-        return [line.strip() for line in file.readlines()]
+from dataclasses import dataclass
 
 
-def neighbours(x, y, max_x, max_y) -> list[tuple[int, int]]:
-    """
-    >>> neighbours(0, 0, 3, 3)
-    [(1, 0), (0, 1), (1, 1)]
-    >>> neighbours(1, 1, 3, 3)
-    [(0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2), (2, 2)]
-    >>> neighbours(2, 2, 3, 3)
-    [(1, 1), (2, 1), (1, 2)]
-    """
+@dataclass(eq=True, frozen=True, slots=True)
+class Vec2:
+    x: int
+    y: int
 
-    n = []
-    for dy in range(-1, 2):
-        for dx in range(-1, 2):
-            mod_x = x + dx
-            mod_y = y + dy
-            if (
-                mod_x >= 0
-                and mod_x < max_x
-                and mod_y >= 0
-                and mod_y < max_y
-                and (dx != 0 or dy != 0)
-            ):
-                n.append((mod_x, mod_y))
+    def __add__(self, other: "Vec2") -> "Vec2":
+        return Vec2(self.x + other.x, self.y + other.y)
 
-    return n
+    def __sub__(self, other: "Vec2") -> "Vec2":
+        return Vec2(self.x - other.x, self.y - other.y)
 
 
-def accessible(inp: list[str]) -> tuple[int, list[tuple[int, int]]]:
+NEIGHBOURS_DX: set[Vec2] = {
+    Vec2(-1, -1),
+    Vec2(0, -1),
+    Vec2(1, -1),
+    Vec2(-1, 0),
+    Vec2(1, 0),
+    Vec2(-1, 1),
+    Vec2(0, 1),
+    Vec2(1, 1),
+}
+
+
+@dataclass
+class Diagram:
+    rolls: set[Vec2]
+    to_check: set[Vec2]
+    size: Vec2
+
+    @classmethod
+    def from_str(cls, input_str: str) -> "Diagram":
+        rolls = set()
+        lines = input_str.splitlines()
+        for y, line in enumerate(lines):
+            for x, char in enumerate(line):
+                if char == "@":
+                    rolls.add(Vec2(x, y))
+        size = Vec2(len(lines[0]), len(lines))
+        return cls(rolls=rolls, to_check=rolls, size=size)
+
+    @classmethod
+    def from_file(cls, filepath: str) -> "Diagram":
+        with open(filepath) as file:
+            input_str = file.read()
+        return cls.from_str(input_str)
+
+    def neighbours(self, vec: Vec2) -> set[Vec2]:
+        vx, vy = vec.x, vec.y
+
+        max_x, max_y = self.size.x, self.size.y
+        rolls = self.rolls
+
+        result: set[Vec2] = set()
+        for d in NEIGHBOURS_DX:
+            nx = vx + d.x
+            ny = vy + d.y
+            if 0 <= nx < max_x and 0 <= ny < max_y:
+                v = Vec2(nx, ny)
+                if v in rolls:
+                    result.add(v)
+        return result
+
+
+def read_example() -> Diagram:
+    return Diagram.from_file("days/day4/examples/1.txt")
+
+
+def accessible(inp: Diagram) -> set[Vec2]:
     """
     >>> accessible(read_example())
-    (13, [(2, 0), (3, 0), (5, 0), (6, 0), (8, 0), (0, 1), (6, 2), (0, 4), (9, 4), (0, 7), (0, 9), (2, 9), (8, 9)])
+    {Vec2(x=0, y=1), Vec2(x=0, y=7), Vec2(x=6, y=2), Vec2(x=0, y=4), Vec2(x=2, y=0), Vec2(x=0, y=9), Vec2(x=8, y=0), Vec2(x=3, y=0), Vec2(x=2, y=9), Vec2(x=8, y=9), Vec2(x=5, y=0), Vec2(x=6, y=0), Vec2(x=9, y=4)}
     """
 
-    assert inp
-
-    max_x = len(inp[0])
-    max_y = len(inp)
-
-    def has_roll(pos: tuple[int, int]) -> bool:
-        x, y = pos
-        return inp[y][x] == "@"
-
-    count = 0
-    to_remove = []
-    for y, line in enumerate(inp):
-        for x, c in enumerate(line):
-            if c == "@":
-                nc = sum(has_roll(pos) for pos in neighbours(x, y, max_x, max_y))
-
-                if nc < 4:
-                    to_remove.append((x, y))
-                    count += 1
-
-    return count, to_remove
+    return {roll for roll in inp.to_check if len(inp.neighbours(roll)) < 4}
 
 
-def remove(inp: list[str], to_remove: list[tuple[int, int]]) -> list[str]:
-    to_remove_set = set(to_remove)
-    result = []
-    for y, line in enumerate(inp):
-        new_line = ""
-        for x, c in enumerate(line):
-            if (x, y) in to_remove_set:
-                new_line += "."
-            else:
-                new_line += c
-
-        result.append(new_line)
-
-    return result
+def remove(inp: Diagram, to_remove: set[Vec2]) -> None:
+    inp.rolls = inp.rolls - to_remove
+    inp.to_check = {nb for roll in to_remove for nb in inp.neighbours(roll)} & inp.rolls
 
 
-def repeat(inp: list[str]) -> int:
+def repeat(inp: Diagram) -> int:
     """
     >>> repeat(read_example())
     43
     """
-    total_count, to_remove = accessible(inp)
+    to_remove = accessible(inp)
+    total_count = len(to_remove)
     while to_remove:
-        inp = remove(inp, to_remove)
-        count, to_remove = accessible(inp)
-        total_count += count
+        remove(inp, to_remove)
+        to_remove = accessible(inp)
+        total_count += len(to_remove)
 
     return total_count
 
 
 def star1(input_str: str) -> str:
-    inp = input_str.splitlines()
-    count, _ = accessible(inp)
-    return str(count)
+    inp = Diagram.from_str(input_str)
+    return str(len(accessible(inp)))
 
 
 def star2(input_str: str) -> str:
-    inp = input_str.splitlines()
+    inp = Diagram.from_str(input_str)
     return str(repeat(inp))
