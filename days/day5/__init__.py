@@ -20,7 +20,19 @@ class Range:
         """
         return self.end - self.start + 1
 
-    def contains(self, number: int) -> bool:
+    def __contains__(self, number: int) -> bool:
+        """
+        >>> 5 in Range(3, 7)
+        True
+        >>> 3 in Range(3, 7)
+        True
+        >>> 7 in Range(3, 7)
+        True
+        >>> 2 in Range(3, 7)
+        False
+        >>> 8 in Range(3, 7)
+        False
+        """
         return self.start <= number <= self.end
 
     def overlaps(self, other: Range) -> bool:
@@ -71,7 +83,7 @@ def fresh(ranges: list[Range], numbers: list[int]) -> int:
             i += 1
         if i == len(merged):
             break
-        if merged[i].contains(n):
+        if n in merged[i]:
             count += 1
 
     return count
