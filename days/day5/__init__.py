@@ -28,10 +28,8 @@ class Range:
     def overlaps(self, other: Range) -> bool:
         return not (self.end < other.start or other.end < self.start)
 
-    def merge(self, other: Range) -> list[Range]:
-        if not self.overlaps(other):
-            return [self, other]
-        return [Range(start=min(self.start, other.start), end=max(self.end, other.end))]
+    def merge(self, other: Range) -> Range:
+        return Range(start=min(self.start, other.start), end=max(self.end, other.end))
 
     @classmethod
     def from_str(cls, range_str: str) -> Range:
@@ -70,8 +68,11 @@ def merge_all_and_count(ranges: list[Range]) -> int:
     sorted_ranges = sorted(ranges, key=lambda r: (r.start, r.end))
     merged = [sorted_ranges[0]]
     for r in sorted_ranges[1:]:
-        last_merged = merged.pop()
-        merged += last_merged.merge(r)
+        last_merged = merged[-1]
+        if last_merged.overlaps(r):
+            merged[-1] = last_merged.merge(r)
+        else:
+            merged.append(r)
 
     return sum(len(r) for r in merged)
 
