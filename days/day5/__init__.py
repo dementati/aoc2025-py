@@ -1,8 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
 
-from icecream import ic
-
 
 @dataclass(eq=True, frozen=True, slots=True)
 class Range:
