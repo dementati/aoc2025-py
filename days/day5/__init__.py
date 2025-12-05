@@ -53,14 +53,14 @@ def fresh(ranges: list[Range], numbers: list[int]) -> int:
     >>> fresh(*read_example())
     3
     """
-    return sum(1 for number in numbers if any(r.contains(number) for r in ranges))
+    merged = merge_all(ranges)
+
+    return sum(1 for number in numbers if any(r.contains(number) for r in merged))
 
 
-def merge_all_and_count(ranges: list[Range]) -> int:
+def merge_all(ranges: list[Range]) -> list[Range]:
     """
-    >>> merge_all_and_count([Range(1, 3), Range(2, 4), Range(6, 8)])
-    7
-    >>> merge_all_and_count(read_example()[0])
+    >>> count_ranges(merge_all(read_example()[0]))
     14
     """
     sorted_ranges = sorted(ranges, key=lambda r: (r.start, r.end))
@@ -72,7 +72,11 @@ def merge_all_and_count(ranges: list[Range]) -> int:
         else:
             merged.append(r)
 
-    return sum(len(r) for r in merged)
+    return merged
+
+
+def count_ranges(ranges: list[Range]) -> int:
+    return sum(len(r) for r in ranges)
 
 
 def star1(input_str: str) -> str:
@@ -82,4 +86,4 @@ def star1(input_str: str) -> str:
 
 def star2(input_str: str) -> str:
     ranges, _ = parse_input(input_str)
-    return str(merge_all_and_count(ranges))
+    return str(count_ranges(merge_all(ranges)))
