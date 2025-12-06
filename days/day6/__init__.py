@@ -49,8 +49,13 @@ def parse_input(input_str: str) -> list[Problem]:
     >>> parse_input(read_example_str())
     [Problem(values=('123', ' 45', '  6'), operator='*'), Problem(values=('328', '64 ', '98 '), operator='+'), Problem(values=(' 51', '387', '215'), operator='*'), Problem(values=('64 ', '23 ', '314'), operator='+')]
     """
+
+    *rows, operators = input_str.splitlines()
+
+    operators = operators.replace(" ", "")
+
     max_width = []
-    for line in input_str.splitlines():
+    for line in rows:
         parts = line.split()
         for i, part in enumerate(parts):
             if len(part) > (max_width[i] if i < len(max_width) else 0):
@@ -60,7 +65,7 @@ def parse_input(input_str: str) -> list[Problem]:
                     max_width[i] = len(part)
 
     grid = []
-    for line in input_str.splitlines()[:-1]:
+    for line in rows:
         row = []
         mw_i = 0
         line_i = 0
@@ -71,8 +76,6 @@ def parse_input(input_str: str) -> list[Problem]:
             mw_i += 1
 
         grid.append(row)
-
-    operators = input_str.splitlines()[-1].split()
 
     problems = []
     for col in range(len(grid[0])):
