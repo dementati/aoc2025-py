@@ -10,11 +10,11 @@ class Problem:
     values: tuple[str, ...]
     operator: str
 
-    def solve(self, values: tuple[str, ...]) -> int:
+    def solve(self) -> int:
         if self.operator == "+":
-            return sum(int(v) for v in values)
+            return sum(int(v) for v in self.values)
 
-        return math.prod(int(v) for v in values)
+        return math.prod(int(v) for v in self.values)
 
 
 def parse_input(input_str: str) -> list[Problem]:
@@ -65,7 +65,7 @@ def grand_total(problems: list[Problem]) -> int:
     >>> grand_total(parse_input2(Path("days/day6/input.txt").read_text()))
     10756006415204
     """
-    return sum(problem.solve(problem.values) for problem in problems)
+    return sum(problem.solve() for problem in problems)
 
 
 def star1(input_str: str) -> str:
