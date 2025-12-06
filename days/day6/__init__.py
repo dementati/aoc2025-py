@@ -74,5 +74,5 @@ def star1(input_str: str) -> str:
 
 
 def star2(input_str: str) -> str:
-    problems = parse_input(input_str)
+    problems = parse_input2(input_str)
     return str(grand_total(problems))
