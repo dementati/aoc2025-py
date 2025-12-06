@@ -9,11 +9,10 @@ class Problem:
     operator: str
 
     def solve(self) -> int:
-        int_values = tuple(int(v) for v in self.values)
         if self.operator == "+":
-            return sum(int_values)
+            return sum(int(v) for v in self.values)
         elif self.operator == "*":
-            return math.prod(int_values)
+            return math.prod(int(v) for v in self.values)
         else:
             raise ValueError(f"Unknown operator: {self.operator}")
 
