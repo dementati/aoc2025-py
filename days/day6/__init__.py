@@ -2,8 +2,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 import math
 
-from icecream import ic
-
 
 @dataclass(eq=True, frozen=True, slots=True)
 class Problem:
@@ -64,17 +62,13 @@ def parse_input(input_str: str) -> list[Problem]:
     grid = []
     for line in input_str.splitlines()[:-1]:
         row = []
-        curr = ""
-        curr_i = 0
-        for c in line:
-            if len(curr) < max_width[curr_i]:
-                curr += c
-            else:
-                row.append(curr)
-                curr = ""
-                curr_i += 1
-
-        row.append(curr)
+        mw_i = 0
+        line_i = 0
+        while line_i <= len(line):
+            curr = line[line_i : line_i + max_width[mw_i]]
+            row.append(curr)
+            line_i += max_width[mw_i] + 1  # +1 for space
+            mw_i += 1
 
         grid.append(row)
 
