@@ -88,7 +88,8 @@ def quantum_split(xs: tuple[str]) -> int:
     if len(xs) == 1:
         return 1
 
-    x, y, *ys = xs
+    x, y, *ys_list = xs
+    ys = tuple(ys_list)
 
     for i, (char_a, char_b) in enumerate(zip(x, y)):
         if char_a == "1" and char_b == "1":
@@ -98,11 +99,9 @@ def quantum_split(xs: tuple[str]) -> int:
             split_b = "".join(
                 "1" if j == i + 1 else "0" if j == i else c for j, c in enumerate(x)
             )
-            return quantum_split((split_a,) + tuple(ys)) + quantum_split(
-                (split_b,) + tuple(ys)
-            )
+            return quantum_split((split_a,) + ys) + quantum_split((split_b,) + ys)
 
-    return quantum_split((x,) + tuple(ys))
+    return quantum_split((x,) + ys)
 
 
 def star1(input_str: str) -> str:
