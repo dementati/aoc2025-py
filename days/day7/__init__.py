@@ -2,59 +2,62 @@ from functools import cache
 from pathlib import Path
 
 
-def split(a: str, b: str) -> tuple[str, int]:
+def split(a: list[int], b: list[int]) -> tuple[list[int], int]:
     """
-    >>> split("0", "0")
-    ('0', 0)
-    >>> split("1", "0")
-    ('1', 0)
-    >>> split("0", "1")
-    ('0', 0)
-    >>> split("010", "010")
-    ('101', 1)
-    >>> split("01010", "01010")
-    ('10101', 2)
-    >>> split("010010", "010010")
-    ('101101', 2)
+    >>> split([0], [0])
+    ([0], 0)
+    >>> split([1], [0])
+    ([1], 0)
+    >>> split([0], [1])
+    ([0], 0)
+    >>> split([0,1,0], [0,1,0])
+    ([1, 0, 1], 1)
+    >>> split([0,1,0,1,0], [0,1,0,1,0])
+    ([1, 0, 1, 0, 1], 2)
+    >>> split([0,1,0,0,1,0], [0,1,0,0,1,0])
+    ([1, 0, 1, 1, 0, 1], 2)
     """
-    result = {}
+    result = [0] * len(a)
 
-    def set_value(i: int, value: str) -> None:
-        result[i] = value if result.get(i, "0") == "0" else "1"
+    def set_value(i: int, value: int) -> None:
+        result[i] = value if result[i] == 0 else 1
 
     split_count = 0
     for i, (char_a, char_b) in enumerate(zip(a, b)):
-        if char_a == "1" and char_b == "1":
+        if char_a == 1 and char_b == 1:
             split_count += 1
 
-        if char_a == "0":
-            set_value(i, "0")
+        if not char_a:
+            set_value(i, 0)
             continue
 
-        if char_b == "0":
-            set_value(i, "1")
+        if not char_b:
+            set_value(i, 1)
             continue
 
-        set_value(i - 1, "1")
-        set_value(i, "0")
-        set_value(i + 1, "1")
+        set_value(i - 1, 1)
+        set_value(i, 0)
+        set_value(i + 1, 1)
 
-    return "".join(result.get(i, "0") for i in range(len(a))), split_count
+    return result, split_count
 
 
-def parse_input(input_str: str) -> list[str]:
+def parse_input(input_str: str) -> list[list[int]]:
     """
     >>> parse_input(Path("days/day7/examples/1.txt").read_text())
-    ['000000010000000', '000000010000000', '000000101000000', '000001010100000', '000010100010000', '000101000101000', '001000100000100', '010101010100010']
+    [[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0], [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0]]
     """
-    result = [
-        "".join("1" if c in "S^" else "0" for c in line)
-        for line in input_str.splitlines()
-    ]
-    return [line for line in result if any(c == "1" for c in line)]
+    result = [[1 if c in "S^" else 0 for c in line] for line in input_str.splitlines()]
+    return [line for line in result if any(line)]
 
 
-def total_splits(inp: list[str]) -> int:
+def parse_input2(input_str: str) -> tuple[str, ...]:
+    return tuple(
+        "".join("1" if c else "0" for c in line) for line in parse_input(input_str)
+    )
+
+
+def total_splits(inp: list[list[int]]) -> int:
     """
     >>> total_splits(parse_input(Path("days/day7/examples/1.txt").read_text()))
     21
@@ -78,7 +81,7 @@ def quantum_split(xs: tuple[str]) -> int:
     2
     >>> quantum_split(("00100", "00100", "01010"))
     4
-    >>> quantum_split(tuple(parse_input(Path("days/day7/examples/1.txt").read_text())))
+    >>> quantum_split(parse_input2(Path("days/day7/examples/1.txt").read_text()))
     40
     """
 
@@ -108,5 +111,5 @@ def star1(input_str: str) -> str:
 
 
 def star2(input_str: str) -> str:
-    inp = parse_input(input_str)
-    return str(quantum_split(tuple(inp)))
+    inp = parse_input2(input_str)
+    return str(quantum_split(inp))
