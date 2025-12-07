@@ -11,10 +11,12 @@ def parse_input(input_str: str) -> list[list[int]]:
     return [line for line in result if any(line)]
 
 
-def parse_input2(input_str: str) -> tuple[str, ...]:
-    return tuple(
-        "".join("1" if c else "0" for c in line) for line in parse_input(input_str)
-    )
+def parse_input_bits(input_str: str) -> tuple[str, ...]:
+    lines = [
+        "".join("1" if c in "S^" else "0" for c in line)
+        for line in input_str.splitlines()
+    ]
+    return tuple(line for line in lines if "1" in line)
 
 
 def split(a: list[int], b: list[int]) -> tuple[list[int], int]:
@@ -76,7 +78,7 @@ def quantum_split(xs: tuple[str]) -> int:
     2
     >>> quantum_split(("00100", "00100", "01010"))
     4
-    >>> quantum_split(parse_input2(Path("days/day7/examples/1.txt").read_text()))
+    >>> quantum_split(parse_input_bits(Path("days/day7/examples/1.txt").read_text()))
     40
     """
 
@@ -105,5 +107,5 @@ def star1(input_str: str) -> str:
 
 
 def star2(input_str: str) -> str:
-    inp = parse_input2(input_str)
+    inp = parse_input_bits(input_str)
     return str(quantum_split(inp))
