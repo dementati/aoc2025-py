@@ -2,6 +2,21 @@ from functools import cache
 from pathlib import Path
 
 
+def parse_input(input_str: str) -> list[list[int]]:
+    """
+    >>> parse_input(Path("days/day7/examples/1.txt").read_text())
+    [[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0], [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0]]
+    """
+    result = [[1 if c in "S^" else 0 for c in line] for line in input_str.splitlines()]
+    return [line for line in result if any(line)]
+
+
+def parse_input2(input_str: str) -> tuple[str, ...]:
+    return tuple(
+        "".join("1" if c else "0" for c in line) for line in parse_input(input_str)
+    )
+
+
 def split(a: list[int], b: list[int]) -> tuple[list[int], int]:
     """
     >>> split([0], [0])
@@ -19,42 +34,22 @@ def split(a: list[int], b: list[int]) -> tuple[list[int], int]:
     """
     result = [0] * len(a)
 
-    def set_value(i: int, value: int) -> None:
-        result[i] = value if result[i] == 0 else 1
-
     split_count = 0
-    for i, (char_a, char_b) in enumerate(zip(a, b)):
-        if char_a == 1 and char_b == 1:
+    for i in range(len(a)):
+        if a[i] and b[i]:
             split_count += 1
 
-        if not char_a:
-            set_value(i, 0)
+        if not a[i]:
             continue
 
-        if not char_b:
-            set_value(i, 1)
+        if not b[i]:
+            result[i] = 1
             continue
 
-        set_value(i - 1, 1)
-        set_value(i, 0)
-        set_value(i + 1, 1)
+        result[i - 1] |= 1
+        result[i + 1] |= 1
 
     return result, split_count
-
-
-def parse_input(input_str: str) -> list[list[int]]:
-    """
-    >>> parse_input(Path("days/day7/examples/1.txt").read_text())
-    [[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0], [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0]]
-    """
-    result = [[1 if c in "S^" else 0 for c in line] for line in input_str.splitlines()]
-    return [line for line in result if any(line)]
-
-
-def parse_input2(input_str: str) -> tuple[str, ...]:
-    return tuple(
-        "".join("1" if c else "0" for c in line) for line in parse_input(input_str)
-    )
 
 
 def total_splits(inp: list[list[int]]) -> int:
