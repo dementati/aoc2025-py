@@ -87,15 +87,20 @@ def quantum_split(xs: tuple[str]) -> int:
 
     x, y, *ys_list = xs
     ys = tuple(ys_list)
+    n = len(x)
 
-    for i, (char_a, char_b) in enumerate(zip(x, y)):
-        if char_a == "1" and char_b == "1":
-            split_a = "".join(
-                "1" if j == i - 1 else "0" if j == i else c for j, c in enumerate(x)
-            )
-            split_b = "".join(
-                "1" if j == i + 1 else "0" if j == i else c for j, c in enumerate(x)
-            )
+    for i in range(n):
+        if x[i] == "1" and y[i] == "1":
+            if i == 0:
+                split_a = "0" + x[1:]
+            else:
+                split_a = x[: i - 1] + "10" + x[i + 1 :]
+
+            if i == n - 1:
+                split_b = x[:i] + "0"
+            else:
+                split_b = x[:i] + "01" + x[i + 2 :]
+
             return quantum_split((split_a,) + ys) + quantum_split((split_b,) + ys)
 
     return quantum_split((x,) + ys)
