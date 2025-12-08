@@ -5,5 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "demapples",
     "icecream>=2.1.8",
 ]
+
+[tool.uv.sources]
+demapples = { git = "https://github.com/dementati/demapples.git" }

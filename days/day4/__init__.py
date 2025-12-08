@@ -1,28 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from functools import cache
-from itertools import product
 
-
-NEIGHBOURS: set[tuple[int, int]] = {
-    (x, y) for (x, y) in product(range(-1, 2), repeat=2) if not (x == 0 and y == 0)
-}
-
-
-@dataclass(eq=True, frozen=True, slots=True)
-class Vec2:
-    x: int
-    y: int
-
-    def __add__(self, other: Vec2) -> Vec2:
-        return Vec2(self.x + other.x, self.y + other.y)
-
-    def __sub__(self, other: Vec2) -> Vec2:
-        return Vec2(self.x - other.x, self.y - other.y)
-
-    @cache
-    def neighbours(self) -> set[Vec2]:
-        return {Vec2(self.x + dx, self.y + dy) for (dx, dy) in NEIGHBOURS}
+from demapples.vec import Vec2
 
 
 @dataclass
