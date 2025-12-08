@@ -83,7 +83,7 @@ def connect(nodes: list[Vec3], n: int | None = None) -> tuple[int, int | None]:
 
 def star1(input_str: str) -> str:
     inp = parse_input(input_str)
-    return str(connect(inp, 1000))
+    return str(connect(inp, 1000)[0])
 
 
 def star2(input_str: str) -> str:
