@@ -1,7 +1,9 @@
 from __future__ import annotations
+from itertools import combinations
 from math import prod
 from pathlib import Path
 
+from demapples.dsu import DisjointSetUnion
 from demapples.vec import Vec3
 
 
@@ -16,18 +18,15 @@ def parse_input(input_str: str) -> list[Vec3]:
     ]
 
 
-def shortest_pairs(nodes: list[Vec3]) -> list[tuple[Vec3, Vec3]]:
+def shortest_pairs(nodes: list[Vec3]) -> list[tuple[int, int]]:
     """
     >>> shortest_pairs(parse_input(Path("days/day8/examples/1.txt").read_text()))[:4]
-    [(Vec3(x=162, y=817, z=812), Vec3(x=425, y=690, z=689)), (Vec3(x=162, y=817, z=812), Vec3(x=431, y=825, z=988)), (Vec3(x=906, y=360, z=560), Vec3(x=805, y=96, z=715)), (Vec3(x=431, y=825, z=988), Vec3(x=425, y=690, z=689))]
+    [(0, 19), (0, 7), (2, 13), (7, 19)]
     """
-    pairs: list[tuple[Vec3, Vec3, float]] = []
-    for i, a in enumerate(nodes):
-        for j, b in enumerate(nodes):
-            if i >= j:
-                continue
-            distance = a.euclidean_distance(b)
-            pairs.append((a, b, distance))
+    pairs: list[tuple[int, int, float]] = [
+        (i, j, nodes[i].squared_distance(nodes[j]))
+        for i, j in combinations(range(len(nodes)), 2)
+    ]
     pairs.sort(key=lambda item: item[2])
     return [(a, b) for a, b, _ in pairs]
 
@@ -40,24 +39,18 @@ def connect(nodes: list[Vec3], n: int | None = None) -> tuple[int, int | None]:
     (20, 25272)
     """
 
-    sorted_pairs = shortest_pairs(nodes)
-
-    circuits: dict[Vec3, frozenset[Vec3]] = {v: frozenset({v}) for v in nodes}
+    circuits = DisjointSetUnion(len(nodes))
 
     p2_result = None
-    for a, b in sorted_pairs[:n]:
-        if circuits[a] is circuits[b]:
-            continue
+    for a, b in shortest_pairs(nodes)[:n]:
+        circuits.union(a, b)
 
-        new_set = circuits[a] | circuits[b]
+        if circuits.get_size(a) == len(nodes):
+            p2_result = nodes[a].x * nodes[b].x
+            break
 
-        if len(new_set) == len(nodes):
-            p2_result = a.x * b.x
-
-        for x in new_set:
-            circuits[x] = new_set
-
-    p1_result = prod(sorted([len(s) for s in set(circuits.values())])[-3:])
+    roots = set(circuits.find(i) for i in range(len(nodes)))
+    p1_result = prod(sorted([circuits.get_size(r) for r in set(roots)])[-3:])
 
     return p1_result, p2_result
 
@@ -70,3 +63,9 @@ def star1(input_str: str) -> str:
 def star2(input_str: str) -> str:
     inp = parse_input(input_str)
     return str(connect(inp)[1])
+
+
+def just_sort(input_str: str) -> str:
+    inp = parse_input(input_str)
+    pairs = shortest_pairs(inp)
+    return ""

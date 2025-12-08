@@ -38,7 +38,7 @@ wheels = [
 [[package]]
 name = "demapples"
 version = "0.1.0"
-source = { git = "https://github.com/dementati/demapples.git#a712f14e93f4669461a26e2ec13ce2667ca51b40" }
+source = { git = "https://github.com/dementati/demapples.git#ca11cfffa0cd92968365d97be79ff5a0de7ef696" }
 
 [[package]]
 name = "executing"
