@@ -1,7 +1,5 @@
 from pathlib import Path
 
-from icecream import ic
-
 
 def parse_input(input_string: str) -> list[tuple[bool, int]]:
     """Parses the input string into a list of tuples.
