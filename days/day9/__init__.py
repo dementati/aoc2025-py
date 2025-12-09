@@ -16,18 +16,16 @@ class Line:
     max_x: int = 0
     min_y: int = 0
     max_y: int = 0
+    horizontal: bool = False
+    vertical: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "min_x", min(self.p1.x, self.p2.x))
         object.__setattr__(self, "max_x", max(self.p1.x, self.p2.x))
         object.__setattr__(self, "min_y", min(self.p1.y, self.p2.y))
         object.__setattr__(self, "max_y", max(self.p1.y, self.p2.y))
-
-    def horizontal(self) -> bool:
-        return self.p1.y == self.p2.y
-
-    def vertical(self) -> bool:
-        return self.p1.x == self.p2.x
+        object.__setattr__(self, "horizontal", self.p1.y == self.p2.y)
+        object.__setattr__(self, "vertical", self.p1.x == self.p2.x)
 
     def xrange(self) -> Range:
         if self.p1.x <= self.p2.x:
@@ -52,23 +50,23 @@ class Line:
         >>> Line(Vec2(2, 3), Vec2(5, 3)).intersects(Line(Vec2(6, 3), Vec2(7, 3))) # Non-overlapping horizontal lines
         False
         """
-        if self.horizontal() and other.horizontal():
+        if self.horizontal and other.horizontal:
             if self.p1.y != other.p1.y:
                 return False
             return not (self.max_x < other.min_x or other.max_x < self.min_x)
 
-        elif self.vertical() and other.vertical():
+        elif self.vertical and other.vertical:
             if self.p1.x != other.p1.x:
                 return False
             return not (self.max_y < other.min_y or other.max_y < self.min_y)
 
-        elif self.horizontal() and other.vertical():
+        elif self.horizontal and other.vertical:
             return (
                 self.min_x <= other.p1.x <= self.max_x
                 and other.min_y <= self.p1.y <= other.max_y
             )
 
-        elif self.vertical() and other.horizontal():
+        elif self.vertical and other.horizontal:
             return (
                 self.min_y <= other.p1.y <= self.max_y
                 and other.min_x <= self.p1.x <= other.max_x
@@ -134,8 +132,8 @@ class Shape:
         assert lines[0].p1 == lines[-1].p2, "Shape must be closed"
         self.lines = tuple(lines)
         self.points = set(line.p1 for line in lines)
-        self.vertical_lines = tuple(line for line in lines if line.vertical())
-        self.horizontal_lines = tuple(line for line in lines if line.horizontal())
+        self.vertical_lines = tuple(line for line in lines if line.vertical)
+        self.horizontal_lines = tuple(line for line in lines if line.horizontal)
 
     @cache
     def contains_point(self, point: Vec2) -> bool:
