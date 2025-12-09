@@ -1,3 +1,8 @@
+from pathlib import Path
+
+from icecream import ic
+
+
 def parse_input(input_string: str) -> list[tuple[bool, int]]:
     """Parses the input string into a list of tuples.
 
@@ -8,17 +13,6 @@ def parse_input(input_string: str) -> list[tuple[bool, int]]:
     return [
         (line[0] == "L", int(line[1:])) for line in input_string.strip().split("\n")
     ]
-
-
-def star1(input_str: str) -> str:
-    instructions = parse_input(input_str)
-    result = solve_star1(instructions)
-    return str(result)
-
-
-def star2(input_str: str) -> str:
-    instructions = parse_input(input_str)
-    return str(solve_star2(instructions))
 
 
 def solve_star1(instructions: list[tuple[bool, int]]) -> int:
@@ -71,14 +65,31 @@ def solve_star2(instructions: list[tuple[bool, int]]) -> int:
     1
     >>> solve_star2([(True, 50), (False, 300), (True, 10)])
     4
+    >>> solve_star2(parse_input(Path("days/day1/examples/1.txt").read_text()))
+    6
     """
 
     dial = 50
     zero_count = 0
+    right_dir = True
     for turn_left, dist in instructions:
-        for _ in range(dist):
-            dial = (dial + (-1 if turn_left else 1)) % 100
-            if dial == 0:
-                zero_count += 1
+        if turn_left != right_dir:
+            dial = (100 - dial) % 100
+            right_dir = not right_dir
+
+        mod = dial + dist
+        dial = mod % 100
+        zero_count += mod // 100
 
     return zero_count
+
+
+def star1(input_str: str) -> str:
+    instructions = parse_input(input_str)
+    result = solve_star1(instructions)
+    return str(result)
+
+
+def star2(input_str: str) -> str:
+    instructions = parse_input(input_str)
+    return str(solve_star2(instructions))
