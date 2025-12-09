@@ -93,7 +93,7 @@ class Rectangle:
         """
         return (abs(self.p2.x - self.p1.x) + 1) * (abs(self.p2.y - self.p1.y) + 1)
 
-    def sides_inside(self, margin: int) -> list[Line]:
+    def sides_with_margin(self, margin: int) -> list[Line]:
         return [
             Line(
                 Vec2(self.p1.x + margin, self.p1.y + margin),
@@ -156,7 +156,9 @@ class Shape:
     def contains_rectangle(self, rectangle: Rectangle) -> bool:
         return all(
             self.contains_point(corner) for corner in rectangle.other_corners()
-        ) and not any(self.intersects_line(side) for side in rectangle.sides_inside(-1))
+        ) and not any(
+            self.intersects_line(side) for side in rectangle.sides_with_margin(-1)
+        )
 
     @classmethod
     def from_points(cls, points: list[Vec2]) -> Shape:
