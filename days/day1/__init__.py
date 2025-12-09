@@ -33,25 +33,6 @@ def solve_star1(instructions: list[tuple[bool, int]]) -> int:
     return zero_count
 
 
-def sign(num: int) -> int:
-    """Returns the sign of a number.
-
-    >>> sign(10)
-    1
-    >>> sign(-5)
-    -1
-    >>> sign(0)
-    0
-    """
-
-    if num > 0:
-        return 1
-    elif num < 0:
-        return -1
-    else:
-        return 0
-
-
 def solve_star2(instructions: list[tuple[bool, int]]) -> int:
     """Solves star 2.
 
