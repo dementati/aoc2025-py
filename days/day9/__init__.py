@@ -12,10 +12,14 @@ from demapples.range import Range
 class Line:
     p1: Vec2
     p2: Vec2
+    min_x: int = 0
+    max_x: int = 0
     min_y: int = 0
     max_y: int = 0
 
     def __post_init__(self) -> None:
+        object.__setattr__(self, "min_x", min(self.p1.x, self.p2.x))
+        object.__setattr__(self, "max_x", max(self.p1.x, self.p2.x))
         object.__setattr__(self, "min_y", min(self.p1.y, self.p2.y))
         object.__setattr__(self, "max_y", max(self.p1.y, self.p2.y))
 
@@ -51,24 +55,24 @@ class Line:
         if self.horizontal() and other.horizontal():
             if self.p1.y != other.p1.y:
                 return False
-            return not (
-                self.xrange().end < other.xrange().start
-                or other.xrange().end < self.xrange().start
-            )
+            return not (self.max_x < other.min_x or other.max_x < self.min_x)
 
         elif self.vertical() and other.vertical():
             if self.p1.x != other.p1.x:
                 return False
-            return not (
-                self.yrange().end < other.yrange().start
-                or other.yrange().end < self.yrange().start
-            )
+            return not (self.max_y < other.min_y or other.max_y < self.min_y)
 
         elif self.horizontal() and other.vertical():
-            return other.p1.x in self.xrange() and self.p1.y in other.yrange()
+            return (
+                self.min_x <= other.p1.x <= self.max_x
+                and other.min_y <= self.p1.y <= other.max_y
+            )
 
         elif self.vertical() and other.horizontal():
-            return self.p1.x in other.xrange() and other.p1.y in self.yrange()
+            return (
+                self.min_y <= other.p1.y <= self.max_y
+                and other.min_x <= self.p1.x <= other.max_x
+            )
 
         raise AssertionError("Unreachable")
 
