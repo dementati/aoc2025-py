@@ -7,7 +7,11 @@ from typing import Callable, cast
 
 
 def run_function(
-    day: int, func_name: str, profile_performance: bool, use_example: bool
+    day: int,
+    func_name: str,
+    profile_performance: bool,
+    use_example: bool,
+    count: int | None = None,
 ) -> None:
     module_name = f"days.day{day}"
     print(
@@ -38,12 +42,35 @@ def run_function(
                 func(input_str)
 
             timer = timeit.Timer(benchmark)
-            number, total = timer.autorange()
-            per_call = total / number
-            print(f"Executed {number} times in {total:.6f} seconds.")
-            print(f"{per_call:.6f} s")
-            print(f"{per_call * 1000:.6f} ms")
-            print(f"{per_call * 1_000_000:.6f} µs")
+
+            def profile_once():
+                number, total = timer.autorange()
+                per_call = total / number
+                return per_call, total, number
+
+            if count:
+                results = []
+
+                for _ in range(count):
+                    per_call, _, _ = profile_once()
+                    results.append(per_call)
+
+                mean, stddev = (
+                    sum(results) / count,
+                    (sum((x - sum(results) / count) ** 2 for x in results) / count)
+                    ** 0.5,
+                )
+                minimum = min(results)
+
+                print(f"{mean:.6f} ± {stddev:.6f} seconds over {count} runs.")
+                print(f"Min: {minimum:.6f} seconds.")
+            else:
+                per_call, total, number = profile_once()
+
+                print(f"Executed {number} times in {total:.6f} seconds.")
+                print(f"{per_call:.6f} s")
+                print(f"{per_call * 1000:.6f} ms")
+                print(f"{per_call * 1_000_000:.6f} µs")
             return
 
         result = func(input_str)
@@ -69,6 +96,12 @@ def main():
         "-e", "--example", action="store_true", help="Use example input"
     )
     parser.add_argument("-p", "--perf", action="store_true", help="Profile performance")
+    parser.add_argument(
+        "-c",
+        "--count",
+        type=int,
+        help="Number of times to run for performance profiling",
+    )
     parser.add_argument(
         "-t", "--test", action="store_true", help="Run tests (doctests)"
     )
@@ -102,7 +135,7 @@ def main():
         func_names = [f"star1", f"star2"]
 
     for func_name in func_names:
-        run_function(day, func_name, args.perf, args.example)
+        run_function(day, func_name, args.perf, args.example, args.count)
 
 
 if __name__ == "__main__":
