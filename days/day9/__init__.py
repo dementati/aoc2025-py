@@ -12,6 +12,12 @@ from demapples.range import Range
 class Line:
     p1: Vec2
     p2: Vec2
+    min_y: int = 0
+    max_y: int = 0
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "min_y", min(self.p1.y, self.p2.y))
+        object.__setattr__(self, "max_y", max(self.p1.y, self.p2.y))
 
     def horizontal(self) -> bool:
         return self.p1.y == self.p2.y
@@ -148,10 +154,8 @@ class Shape:
         crossings = 0
         for line in self.vertical_lines:
             x0 = line.p1.x
-            y_min = min(line.p1.y, line.p2.y)
-            y_max = max(line.p1.y, line.p2.y)
 
-            if x < x0 and y_min <= y < y_max:
+            if x < x0 and line.min_y <= y < line.max_y:
                 crossings += 1
 
         return (crossings % 2) == 1
