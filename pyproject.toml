@@ -9,6 +9,7 @@ dependencies = [
     "icecream>=2.1.8",
     "matplotlib>=3.10.7",
     "pygame-ce>=2.5.6",
+    "pyinstrument>=5.1.1",
 ]
 
 [tool.uv.sources]

@@ -84,13 +84,12 @@ class Rectangle:
     p1: Vec2
     p2: Vec2
 
-    def corners(self) -> list[Vec2]:
-        return [
-            Vec2(self.p1.x, self.p1.y),
-            Vec2(self.p1.x, self.p2.y),
-            Vec2(self.p2.x, self.p1.y),
-            Vec2(self.p2.x, self.p2.y),
-        ]
+    def other_corners(self) -> tuple[Vec2, Vec2]:
+        """
+        >>> Rectangle(Vec2(1, 2), Vec2(4, 6)).other_corners()
+        (Vec2(x=1, y=6), Vec2(x=4, y=2))
+        """
+        return (Vec2(self.p1.x, self.p2.y), Vec2(self.p2.x, self.p1.y))
 
     def area(self) -> int:
         """
@@ -124,11 +123,15 @@ class Shape:
     def __init__(self, lines: list[Line]) -> None:
         assert lines[0].p1 == lines[-1].p2, "Shape must be closed"
         self.lines = tuple(lines)
+        self.points = set(line.p1 for line in lines)
         self.vertical_lines = tuple(line for line in lines if line.vertical())
         self.horizontal_lines = tuple(line for line in lines if line.horizontal())
 
     @cache
     def contains_point(self, point: Vec2) -> bool:
+        if point in self.points:
+            return True
+
         x, y = point.x, point.y
 
         # Treat points on the boundary as inside.
@@ -145,9 +148,10 @@ class Shape:
         crossings = 0
         for line in self.vertical_lines:
             x0 = line.p1.x
-            yr = line.yrange()
+            y_min = min(line.p1.y, line.p2.y)
+            y_max = max(line.p1.y, line.p2.y)
 
-            if x < x0 and yr.start <= y < yr.end:
+            if x < x0 and y_min <= y < y_max:
                 crossings += 1
 
         return (crossings % 2) == 1
@@ -157,7 +161,7 @@ class Shape:
 
     def contains_rectangle(self, rectangle: Rectangle) -> bool:
         return all(
-            self.contains_point(corner) for corner in rectangle.corners()
+            self.contains_point(corner) for corner in rectangle.other_corners()
         ) and not any(self.intersects_line(side) for side in rectangle.sides_inside(-1))
 
     @classmethod
