@@ -149,6 +149,7 @@ class Shape:
 
         return (crossings % 2) == 1
 
+    @cache
     def intersects_line(self, line: Line) -> bool:
         return any(line.intersects(other) for other in self.lines)
 
