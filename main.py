@@ -6,7 +6,9 @@ import timeit
 from typing import Callable, cast
 
 
-def run_function(day: int, func_name: str, profile_performance: bool) -> None:
+def run_function(
+    day: int, func_name: str, profile_performance: bool, use_example: bool
+) -> None:
     module_name = f"days.day{day}"
     print(
         f"{'Profiling' if profile_performance else 'Running'} {module_name}.{func_name}()..."
@@ -16,7 +18,9 @@ def run_function(day: int, func_name: str, profile_performance: bool) -> None:
         module = importlib.import_module(module_name)
         func = cast(Callable[[str], str], getattr(module, func_name, None))
 
-        with open(f"days/day{day}/input.txt") as file:
+        file_path = "examples/1.txt" if use_example else "input.txt"
+
+        with open(f"days/day{day}/{file_path}") as file:
             input_str = file.read()
 
         if func is None:
@@ -61,6 +65,9 @@ def main():
         help="Optional star of the challenge (1 or 2) to run",
     )
     parser.add_argument("-f", "--func", type=str, help="Optional function name to run")
+    parser.add_argument(
+        "-e", "--example", action="store_true", help="Use example input"
+    )
     parser.add_argument("-p", "--perf", action="store_true", help="Profile performance")
     parser.add_argument(
         "-t", "--test", action="store_true", help="Run tests (doctests)"
@@ -95,7 +102,7 @@ def main():
         func_names = [f"star1", f"star2"]
 
     for func_name in func_names:
-        run_function(day, func_name, args.perf)
+        run_function(day, func_name, args.perf, args.example)
 
 
 if __name__ == "__main__":
