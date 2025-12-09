@@ -193,10 +193,9 @@ def largest2(points: list[Vec2]) -> int:
     max_area = 0
     for pair in combinations(points, 2):
         rect = Rectangle(*pair)
-        if shape.contains_rectangle(rect):
-            new_area = rect.area()
-            if new_area > max_area:
-                max_area = new_area
+        area = rect.area()
+        if area > max_area and shape.contains_rectangle(rect):
+            max_area = area
     return max_area
 
 
