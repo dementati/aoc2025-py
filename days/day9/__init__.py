@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from functools import cache
 from itertools import combinations
 from pathlib import Path
 
@@ -7,16 +8,10 @@ from demapples.vec import Vec2
 from demapples.range import Range
 
 
-@dataclass
+@dataclass(eq=True, frozen=True, slots=True)
 class Line:
     p1: Vec2
     p2: Vec2
-
-    def __init__(self, p1: Vec2, p2: Vec2) -> None:
-        if p1.x != p2.x and p1.y != p2.y:
-            raise ValueError("Line must be axis-aligned")
-        self.p1 = p1
-        self.p2 = p2
 
     def horizontal(self) -> bool:
         return self.p1.y == self.p2.y
@@ -72,12 +67,10 @@ class Line:
         raise AssertionError("Unreachable")
 
 
+@dataclass(eq=True, frozen=True, slots=True)
 class Ray:
-    def __init__(self, start: Vec2, direction: Vec2) -> None:
-        if direction.x != 0 and direction.y != 0:
-            raise ValueError("Ray must be axis-aligned")
-        self.start = start
-        self.direction = direction
+    start: Vec2
+    direction: Vec2
 
     def horizontal(self) -> bool:
         return self.direction.y == 0
@@ -137,7 +130,7 @@ class Ray:
         raise AssertionError("Unreachable")
 
 
-@dataclass
+@dataclass(eq=True, frozen=True, slots=True)
 class Rectangle:
     p1: Vec2
     p2: Vec2
@@ -184,8 +177,9 @@ class Rectangle:
 class Shape:
     def __init__(self, lines: list[Line]) -> None:
         assert lines[0].p1 == lines[-1].p2, "Shape must be closed"
-        self.lines = lines
+        self.lines = tuple(lines)
 
+    @cache
     def contains_point(self, point: Vec2) -> bool:
         rays = [
             Ray(point, Vec2(1, 0)),
@@ -239,9 +233,8 @@ def largest2(points: list[Vec2]) -> int:
     """
     shape = Shape.from_points(points)
     max_area = 0
-    all_combinations = list(combinations(points, 2))
-    for i, (p1, p2) in enumerate(all_combinations):
-        rect = Rectangle(p1, p2)
+    for pair in combinations(points, 2):
+        rect = Rectangle(*pair)
         if shape.contains_rectangle(rect):
             new_area = rect.area()
             if new_area > max_area:
@@ -271,16 +264,6 @@ def render(input_str: str) -> None:
         x1, y1 = line.p1.x, line.p1.y
         x2, y2 = line.p2.x, line.p2.y
         plt.plot([x1, x2], [y1, y2], color="red")
-
-    for corner in rect.corners():
-        plt.plot(corner.x, corner.y, "bo")
-
-    for line in rect.sides_inside(-1):
-        x1, y1 = line.p1.x, line.p1.y
-        x2, y2 = line.p2.x, line.p2.y
-        plt.plot([x1, x2], [y1, y2], color="green")
-
-    plt.plot(rect.center().x, rect.center().y, "go")
 
     plt.axis("equal")  # keep scale consistent so lines aren't distorted
     plt.show()
