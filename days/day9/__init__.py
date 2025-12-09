@@ -78,57 +78,6 @@ class Ray:
     def vertical(self) -> bool:
         return self.direction.x == 0
 
-    def intersects_line(self, line: Line) -> bool:
-        """
-        >>> Ray(Vec2(2, 3), Vec2(1, 0)).intersects_line(Line(Vec2(4, 3), Vec2(6, 3))) # Horizontal ray and horizontal line, with ray starting before line
-        True
-        >>> Ray(Vec2(5, 3), Vec2(1, 0)).intersects_line(Line(Vec2(4, 3), Vec2(6, 3))) # Horizontal ray and horizontal line, with ray starting inside line
-        True
-        >>> Ray(Vec2(7, 3), Vec2(1, 0)).intersects_line(Line(Vec2(4, 3), Vec2(6, 3))) # Horizontal ray and horizontal line, with ray starting after line
-        False
-        """
-        if self.horizontal() and line.horizontal():
-            if self.start.y != line.p1.y:
-                return False
-
-            if self.start.x in line.xrange():
-                return True
-
-            if self.direction.x > 0:
-                return self.start.x <= line.xrange().start
-            else:
-                return self.start.x >= line.xrange().end
-
-        elif self.vertical() and line.vertical():
-            if self.start.x != line.p1.x:
-                return False
-
-            if self.start.y in line.yrange():
-                return True
-
-            if self.direction.y > 0:
-                return self.start.y <= line.yrange().start
-            else:
-                return self.start.y >= line.yrange().end
-
-        elif self.horizontal() and line.vertical():
-            if self.start.y in line.yrange():
-                if self.direction.x > 0:
-                    return self.start.x <= line.p1.x
-                else:
-                    return self.start.x >= line.p1.x
-            return False
-
-        elif self.vertical() and line.horizontal():
-            if self.start.x in line.xrange():
-                if self.direction.y > 0:
-                    return self.start.y <= line.p1.y
-                else:
-                    return self.start.y >= line.p1.y
-            return False
-
-        raise AssertionError("Unreachable")
-
 
 @dataclass(eq=True, frozen=True, slots=True)
 class Rectangle:
@@ -142,9 +91,6 @@ class Rectangle:
             Vec2(self.p2.x, self.p1.y),
             Vec2(self.p2.x, self.p2.y),
         ]
-
-    def center(self) -> Vec2:
-        return Vec2((self.p1.x + self.p2.x) // 2, (self.p1.y + self.p2.y) // 2)
 
     def area(self) -> int:
         """
@@ -178,19 +124,33 @@ class Shape:
     def __init__(self, lines: list[Line]) -> None:
         assert lines[0].p1 == lines[-1].p2, "Shape must be closed"
         self.lines = tuple(lines)
+        self.vertical_lines = tuple(line for line in lines if line.vertical())
+        self.horizontal_lines = tuple(line for line in lines if line.horizontal())
 
     @cache
     def contains_point(self, point: Vec2) -> bool:
-        rays = [
-            Ray(point, Vec2(1, 0)),
-            Ray(point, Vec2(-1, 0)),
-            Ray(point, Vec2(0, 1)),
-            Ray(point, Vec2(0, -1)),
-        ]
+        x, y = point.x, point.y
 
-        return all(
-            any(ray.intersects_line(line) for line in self.lines) for ray in rays
-        )
+        # Treat points on the boundary as inside.
+        for line in self.horizontal_lines:
+            if y == line.p1.y:
+                if x in line.xrange():
+                    return True
+
+        for line in self.vertical_lines:
+            if x == line.p1.x:
+                if y in line.yrange():
+                    return True
+
+        crossings = 0
+        for line in self.vertical_lines:
+            x0 = line.p1.x
+            yr = line.yrange()
+
+            if x < x0 and yr.start <= y < yr.end:
+                crossings += 1
+
+        return (crossings % 2) == 1
 
     def intersects_line(self, line: Line) -> bool:
         return any(line.intersects(other) for other in self.lines)
@@ -255,8 +215,6 @@ def star2(input_str: str) -> str:
 def render(input_str: str) -> None:
     points = parse_input(input_str)
     shape = Shape.from_points(points)
-
-    rect = Rectangle(p1=Vec2(x=9, y=5), p2=Vec2(x=2, y=3))
 
     import matplotlib.pyplot as plt
 
