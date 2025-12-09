@@ -115,7 +115,7 @@ wheels = [
 [[package]]
 name = "demapples"
 version = "0.1.0"
-source = { git = "https://github.com/dementati/demapples.git#a355ba8308758bbf270c53a83b1cb5eb4a17a8fc" }
+source = { git = "https://github.com/dementati/demapples.git#5213b6f37d1038432e01c688e06b20aa980302c6" }
 dependencies = [
     { name = "pyinstrument" },
 ]
