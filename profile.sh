@@ -1,3 +1,3 @@
 #!/bin/bash
 
-uv run pyinstrument main.py "$@"
+uv run pyinstrument --color main.py "$@"

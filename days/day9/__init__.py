@@ -5,7 +5,6 @@ from itertools import combinations
 from pathlib import Path
 
 from demapples.vec import Vec2
-from demapples.range import Range
 
 
 @dataclass(eq=True, frozen=True, slots=True)
@@ -26,18 +25,6 @@ class Line:
         object.__setattr__(self, "max_y", max(self.p1.y, self.p2.y))
         object.__setattr__(self, "horizontal", self.p1.y == self.p2.y)
         object.__setattr__(self, "vertical", self.p1.x == self.p2.x)
-
-    def xrange(self) -> Range:
-        if self.p1.x <= self.p2.x:
-            return Range(self.p1.x, self.p2.x)
-        else:
-            return Range(self.p2.x, self.p1.x)
-
-    def yrange(self) -> Range:
-        if self.p1.y <= self.p2.y:
-            return Range(self.p1.y, self.p2.y)
-        else:
-            return Range(self.p2.y, self.p1.y)
 
     def intersects(self, other: Line) -> bool:
         """
@@ -145,12 +132,12 @@ class Shape:
         # Treat points on the boundary as inside.
         for line in self.horizontal_lines:
             if y == line.p1.y:
-                if x in line.xrange():
+                if line.min_x <= x <= line.max_x:
                     return True
 
         for line in self.vertical_lines:
             if x == line.p1.x:
-                if y in line.yrange():
+                if line.min_y <= y <= line.max_y:
                     return True
 
         crossings = 0
