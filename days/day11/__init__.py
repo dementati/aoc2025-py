@@ -48,15 +48,14 @@ def all_paths_2(input_str: str) -> int:
 
     @cache
     def dfs(start: str, found: frozenset[str]) -> int:
-        if start == "out":
-            return len(found) == 2
-
-        assert start in graph, f"no start in graph: {start}"
-
-        if start == "fft" or start == "dac":
-            found = found.union({start})
-
-        return sum(dfs(n, found) for n in graph[start])
+        return (
+            len(found) == 2
+            if start == "out"
+            else sum(
+                dfs(n, found.union({start} if start in ("fft", "dac") else frozenset()))
+                for n in graph[start]
+            )
+        )
 
     return dfs("svr", frozenset({}))
 
