@@ -8,6 +8,7 @@ dependencies = [
     "demapples",
     "icecream>=2.1.8",
     "matplotlib>=3.10.7",
+    "networkx>=3.6.1",
     "scipy>=1.16.3",
 ]
 
